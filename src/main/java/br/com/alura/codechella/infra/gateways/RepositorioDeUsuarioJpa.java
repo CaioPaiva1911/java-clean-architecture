@@ -26,7 +26,24 @@ public class RepositorioDeUsuarioJpa implements RepositorioDeUsuario {
 
     @Override
     public List<Usuario> listarTodos() {
-//        return repositorio.findAll();
-        return List.of();
+        return repositorio.findAll().stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    public Usuario alteraUsuario(String cpf, Usuario usuario) {
+        UsuarioEntity entity = repositorio.findByCpf(cpf);
+        if (entity != null) {
+            var atualizado = mapper.toEntity(usuario);
+            atualizado.setId(entity.getId());
+            repositorio.save(atualizado);
+            return mapper.toDomain(atualizado);
+        }
+        return null;
+    }
+
+    @Override
+    public void excluiUsuario(String cpf) {
+        UsuarioEntity entity = repositorio.findByCpf(cpf);
+        repositorio.deleteById(entity.getId());
     }
 }
